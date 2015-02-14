@@ -10,7 +10,10 @@ class Demo extends React.Component {
   render(){
     return <div onClick={this._onClick.bind(this)}>
       {this.state.shifted && <div>buyakasha</div>}
-      <Movable>
+
+      <Movable
+        style={{ transition: 'all 2s ease', backgroundColor: 'hsl(180,50%,50%)', fontSize: '30em' }}
+      >
         Sup
       </Movable>
     </div>;
@@ -18,6 +21,12 @@ class Demo extends React.Component {
 
   _onClick(){
     this.setState({ shifted: !this.state.shifted });
+  }
+
+  componentDidMount(){
+    setTimeout(() => {
+      this.forceUpdate();
+    }.bind(this), 5000);
   }
 
 }
