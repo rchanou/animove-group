@@ -6,7 +6,7 @@ var module = {
     {
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      loader: '6to5-loader?experimental'
+      loader: '6to5-loader?experimental&playground'
     }
   ]
 };

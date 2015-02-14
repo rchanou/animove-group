@@ -1,12 +1,9 @@
 import React from 'react/addons';
 
 
-class Movable extends React.Component {
+export default class Movable extends React.Component {
 
-  constructor(props){
-    super(props);
-    this.state = {};
-  }
+  static defaultProps = { element: 'div' };
 
   render(){
     let { element, children, ...otherProps } = this.props;
@@ -19,7 +16,3 @@ class Movable extends React.Component {
   }
 
 };
-
-Movable.defaultProps = { element: 'div' };
-
-export default Movable;

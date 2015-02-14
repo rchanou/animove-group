@@ -5,15 +5,12 @@ import Movable from '../component/movable.jsx';
 
 class Demo extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { shifted: false };
-  }
+  state = { shifted: false };
 
   render(){
-    return <div onClick={this._onClick}>
+    return <div onClick={this._onClick.bind(this)}>
       {this.state.shifted && <div>buyakasha</div>}
-      <Movable element='div'>
+      <Movable>
         Sup
       </Movable>
     </div>;
