@@ -12,7 +12,7 @@ class Demo extends React.Component {
       {this.state.shifted && <div>buyakasha</div>}
 
       <Movable
-        style={{ transition: 'all 2s ease', backgroundColor: 'hsl(180,50%,50%)' }}
+        style={{ WebkitTransition: 'all 1s ease-out', transition: 'all 1s ease-out', backgroundColor: 'hsl(180,50%,50%)' }}
       >
         Sup
       </Movable>

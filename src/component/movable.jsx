@@ -12,6 +12,7 @@ export default class Movable extends React.Component {
 
     var newProps = objectAssign({}, otherProps);
     newProps.ref = 'me';
+    //newProps.key = Math.random();
     if (this.state.animating){
       newProps.style.visibility = 'hidden';
     } else {
@@ -47,6 +48,18 @@ export default class Movable extends React.Component {
       this.setState({ animating: false });
     }.bind(this));
 
+    node.addEventListener('transitionend', e => {
+      console.log('animation end');
+      if (this.movingNode){
+        try {
+          document.body.removeChild(this.movingNode);
+        } catch(ex){
+        }
+        delete this.movingNode;
+      }
+      this.setState({ animating: false });
+    }.bind(this));
+
     /*
       setTimeout(() => {
         node.style.backgroundColor = 'red';
@@ -64,7 +77,6 @@ export default class Movable extends React.Component {
 
   componentWillReceiveProps(nextProps){
     console.log('receivng');
-    this.setState({ animating: true });
 
     if (!this.movingNode){
       console.log('cloning');
@@ -73,14 +85,20 @@ export default class Movable extends React.Component {
       var top = rect.top + document.documentElement.scrollTop;
       var left = rect.left + document.documentElement.scrollLeft;
 
-      this.movingNode = thisNode.cloneNode(true);
-      this.movingNode.removeAttribute('data-reactid');
+      //this.movingNode = thisNode.cloneNode(true);
+      //this.movingNode.removeAttribute('data-reactid');
+
+      this.movingNode = document.createElement(thisNode.tagName);
+      this.movingNode.innerHTML = thisNode.innerHTML;
+      this.movingNode.style.cssText = getComputedStyle(thisNode).cssText;
       this.movingNode.style.position = 'absolute';
       this.movingNode.style.top = top + 'px';
       this.movingNode.style.left = left + 'px';
-
       document.body.appendChild(this.movingNode);
+
     }
+      this.setState({ animating: true });
+
   }
 
   componentDidUpdate(){
