@@ -14,6 +14,8 @@ export default class Movable extends React.Component {
     newProps.ref = 'me';
     if (this.state.animating){
       newProps.style.visibility = 'hidden';
+    } else {
+      newProps.style.visibility = '';
     }
 
     return React.createElement(
@@ -25,18 +27,24 @@ export default class Movable extends React.Component {
 
   componentDidMount(){
     var node = this.refs.me.getDOMNode();
+
+    /*
     node.style.position = 'absolute';
     node.style.top = '200px';
     node.style.left = '200px';
     console.log(node.getBoundingClientRect(), document.documentElement.scrollTop, document.documentElement.scrollLeft, document);
+    */
 
     node.addEventListener('webkitTransitionEnd', e => {
       console.log('animation end');
-      this.setState({ animating: false });
       if (this.movingNode){
-        document.body.removeChild(this.movingNode);
+        try {
+          document.body.removeChild(this.movingNode);
+        } catch(ex){
+        }
         delete this.movingNode;
       }
+      this.setState({ animating: false });
     }.bind(this));
 
     /*
@@ -55,6 +63,9 @@ export default class Movable extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
+    console.log('receivng');
+    this.setState({ animating: true });
+
     if (!this.movingNode){
       console.log('cloning');
       var thisNode = this.refs.me.getDOMNode();
@@ -63,6 +74,7 @@ export default class Movable extends React.Component {
       var left = rect.left + document.documentElement.scrollLeft;
 
       this.movingNode = thisNode.cloneNode(true);
+      this.movingNode.removeAttribute('data-reactid');
       this.movingNode.style.position = 'absolute';
       this.movingNode.style.top = top + 'px';
       this.movingNode.style.left = left + 'px';
@@ -72,7 +84,26 @@ export default class Movable extends React.Component {
   }
 
   componentDidUpdate(){
+    if (this.movingNode){
+      var thisNode = this.refs.me.getDOMNode();
+      var rect = thisNode.getBoundingClientRect();
+      var top = rect.top + document.documentElement.scrollTop;
+      var left = rect.left + document.documentElement.scrollLeft;
 
+      if (this.state.animating && (this.movingNode.style.top === top + 'px') && (this.movingNode.style.left === left + 'px')){
+        console.log('this');
+        try {
+          document.body.removeChild(this.movingNode);
+        } catch(ex){
+        }
+        delete this.movingNode;
+        this.setState({ animating: false });
+      } else {
+        console.log('that');
+        this.movingNode.style.top = top + 'px';
+        this.movingNode.style.left = left + 'px';
+      }
+    }
   }
 
 };
