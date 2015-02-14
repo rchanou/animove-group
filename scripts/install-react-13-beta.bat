@@ -1,0 +1,1 @@
+npm install --save react@0.13.0-beta.1
