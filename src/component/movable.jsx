@@ -12,11 +12,19 @@ export default class Movable extends React.Component {
     let { element, children, ...otherProps } = this.props;
 
     var newProps = clone(otherProps);
-
     newProps.ref = 'me';
+
+    if (!newProps.style){
+      newProps.style = {};
+    }
+
     newProps.style.visibility = 'hidden';
     delete newProps.style.transition;
     delete newProps.style.WebkitTransition;
+    delete newProps.style.transitionDuration;
+    delete newProps.style.WebkitTransitionDuration;
+    delete newProps.style.transitionDelay;
+    delete newProps.style.WebkitTransitionDelay;
 
     return React.createElement(element, newProps, children);
   }
@@ -25,35 +33,36 @@ export default class Movable extends React.Component {
     var node = this.refs.me.getDOMNode();
     var parent = node.parentElement;
 
-    var eventNode = document.createElement(this.props.element);
-    parent.appendChild(eventNode);
+    var animatedNode = document.createElement(this.props.element);
+    parent.appendChild(animatedNode);
 
-    this.moveMover = () => {
-
+    this.moveAnimatedComponent = () => {
       var rect = node.getBoundingClientRect();
       var parentRect = parent.getBoundingClientRect();
-      console.log('this is happening', rect.top, rect.left, parentRect.top, parentRect.left);
       var top = rect.top - parentRect.top;
       var left = rect.left - parentRect.left;
 
       let { element, children, ...otherProps } = this.props;
 
-      var eventComponentProps = clone(otherProps);
+      var newProps = clone(otherProps);
+      if (!newProps.style){
+        newProps.style = {};
+      }
+      newProps.style.position = 'absolute';
+      newProps.style.top = top;
+      newProps.style.left = left;
 
-      eventComponentProps.style.position = 'absolute';
-      eventComponentProps.style.top = top;
-      eventComponentProps.style.left = left;
-
-      var eventComponent = React.createElement(
-        element, eventComponentProps, children
+      var animatedComponent = React.createElement(
+        element, newProps, children
       );
 
-      React.render(eventComponent, eventNode);
+      React.render(animatedComponent, animatedNode);
     };
-    this.moveMover();
+
+    this.moveAnimatedComponent();
   }
 
   componentDidUpdate(){
-    this.moveMover();
+    this.moveAnimatedComponent();
   }
 };
