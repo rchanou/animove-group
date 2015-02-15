@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react/addons';
 import clone from 'clone';
 
 
@@ -6,15 +6,93 @@ export default class Animove extends React.Component {
 
   static defaultProps = { tagName: 'div' };
 
-
+  state = { movers: [] };
 
   render(){
     let { tagName, children, ...otherProps } = this.props;
 
-    React.Children.map(this.props.children, child => {
-      console.log(child);
+    var kids = [];
+    
+    React.Children.forEach(this.props.children, kid => {
+      console.log(kid);
+      
+      var newKid;
+      if (kid.props){
+        var newProps = clone(kid.props);
+        newProps.key = kid.key;
+        newProps.ref = kid.key;
+        if (!newProps.style){
+          newProps.style = {};
+        }        
+        newProps.style.visibility = 'hidden';
+        
+        newKid = React.createElement(
+          kid.type, newProps, kid.props.children
+        );
+      } else {
+        newKid = React.createElement(
+          'span',
+          { key: kid, style: { visibility: 'hidden' } },
+          kid
+        );
+      }
+      kids.push(newKid);
     });
-
+    
+    for (var mover of this.state.movers){
+      let { children, ...props } = mover.props;
+      console.log('creating', mover.type, props, children);
+      var newKid = React.createElement(
+        mover.type,
+        props,
+        children
+      );
+      
+      kids.push(newKid);
+    }
+    
+    console.log('kids', this.props.children);
+    
+    return React.createElement(
+      tagName, otherProps, kids
+    );
+  }
+  
+  setMovers(){
+    var movers = [];
+    
+    React.Children.forEach(this.props.children, kid => {
+      if (kid.props){
+        var props = clone(kid.props);
+        props.key = kid.key + 'mover';
+        //delete props.style.visibility;
+      
+        movers.push( { type: kid.type, props } );
+      } else {
+        movers.push( { type: 'span', props: { key: kid + 'mover', children: kid } } );
+      }
+    });
+    console.log('will change state', this.state, movers);
+    this.setState({ movers });
+  }
+  
+  componentDidMount(){
+    this.setMovers();
+  }
+  
+  componentWillReceiveProps(){
+    this.receivingProps = true;
+  }
+  
+  componentDidUpdate(){
+    if (!this.receivingProps){
+      return;
+    }
+    this.receivingProps = false;
+      
+      
+    
+    /*
     var newProps = clone(otherProps);
     newProps.ref = 'me';
 
@@ -31,8 +109,10 @@ export default class Animove extends React.Component {
     delete newProps.style.WebkitTransitionDelay;
 
     return React.createElement(tagName, newProps, children);
+    */
   }
-
+  
+  /*
   componentDidMount(){
     var me = this.refs.me.getDOMNode();
     var parent = me.parentElement;//.parentElement;
@@ -73,5 +153,5 @@ export default class Animove extends React.Component {
   componentWillUnmount(){
     React.unmountComponentAtNode(this.animatedNode);
   }
-
+  */
 };

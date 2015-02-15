@@ -53,8 +53,6 @@ class Demo extends React.Component {
         {listNodes}
         somethingelse
       </Animove>
-
-      <ul><li>aa</li><li>bb</li></ul>
     </div>;
   }
 
