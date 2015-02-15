@@ -31,7 +31,7 @@ export default class Animove extends React.Component {
 
   componentDidMount(){
     var me = this.refs.me.getDOMNode();
-    var parent = me.parentElement;
+    var parent = me.parentElement.parentElement;
 
     var animatedNode = document.createElement(this.props.tagName);
     parent.appendChild(animatedNode);

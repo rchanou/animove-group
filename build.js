@@ -2,7 +2,6 @@ var webpack = require('webpack');
 
 var module = {
   loaders: [
-    // the optional 'selfContained' transformer tells 6to5 to require the runtime instead of inlining it.
     {
       test: /\.jsx?$/,
       exclude: /node_modules/,
