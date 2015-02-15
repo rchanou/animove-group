@@ -1,6 +1,14 @@
 import React from 'react/addons';
+import objectAssign from 'object-assign';
 
 import Movable from '../component/movable.jsx';
+
+
+var style = {
+  WebkitTransition: 'all 3s ease-out',
+  transition: 'all ease-out 3s',
+  backgroundColor: 'hsl(180,50%,50%)'
+};
 
 
 class Demo extends React.Component {
@@ -12,7 +20,7 @@ class Demo extends React.Component {
       {this.state.shifted && <div>buyakasha</div>}
 
       <Movable
-        style={{ WebkitTransition: 'all 1s ease-out', transition: 'all 1s ease-out', backgroundColor: 'hsl(180,50%,50%)' }}
+        style={objectAssign({}, style, this.state.shifted? { backgroundColor: 'red' }: {})}
       >
         Sup
       </Movable>
