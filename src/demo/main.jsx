@@ -1,5 +1,5 @@
 import React from 'react/addons';
-import objectAssign from 'object-assign';
+import clone from 'clone';
 
 import Movable from '../component/movable.jsx';
 
@@ -15,15 +15,18 @@ class Demo extends React.Component {
   state = { shifted: false };
 
   render(){
+    var calcStyle = clone(style);
+    calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
+
     return <div onClick={this._onClick.bind(this)}>
       {this.state.shifted && <div>buyakasha</div>}
 
-
       <Movable
-        style={objectAssign({}, { backgroundColor: this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)' })}
+        style={calcStyle}
       >
         Sup
       </Movable>
+
       <div>
         ttt
         <div>
