@@ -30,14 +30,14 @@ export default class Movable extends React.Component {
   }
 
   componentDidMount(){
-    var node = this.refs.me.getDOMNode();
-    var parent = node.parentElement;
+    var me = this.refs.me.getDOMNode();
+    var parent = me.parentElement;
 
     var animatedNode = document.createElement(this.props.element);
     parent.appendChild(animatedNode);
 
     this.moveAnimatedComponent = () => {
-      var rect = node.getBoundingClientRect();
+      var rect = me.getBoundingClientRect();
       var parentRect = parent.getBoundingClientRect();
       var top = rect.top - parentRect.top;
       var left = rect.left - parentRect.left;
