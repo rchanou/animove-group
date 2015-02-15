@@ -1,4 +1,4 @@
-import React from 'react/addons';
+import React from 'react';
 import clone from 'clone';
 
 import Animove from '../component/animove.jsx';

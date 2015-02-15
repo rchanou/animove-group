@@ -1,15 +1,15 @@
-import React from 'react/addons';
+import React from 'react';
 import clone from 'clone';
 
 
 export default class Animove extends React.Component {
 
-  static defaultProps = { element: 'div' };
+  static defaultProps = { tagName: 'div' };
 
   state = { animating: false };
 
   render(){
-    let { element, children, ...otherProps } = this.props;
+    let { tagName, children, ...otherProps } = this.props;
 
     var newProps = clone(otherProps);
     newProps.ref = 'me';
@@ -26,14 +26,14 @@ export default class Animove extends React.Component {
     delete newProps.style.transitionDelay;
     delete newProps.style.WebkitTransitionDelay;
 
-    return React.createElement(element, newProps, children);
+    return React.createElement(tagName, newProps, children);
   }
 
   componentDidMount(){
     var me = this.refs.me.getDOMNode();
     var parent = me.parentElement;
 
-    var animatedNode = document.createElement(this.props.element);
+    var animatedNode = document.createElement(this.props.tagName);
     parent.appendChild(animatedNode);
 
     this.moveAnimatedComponent = () => {
@@ -42,7 +42,7 @@ export default class Animove extends React.Component {
       var top = rect.top - parentRect.top;
       var left = rect.left - parentRect.left;
 
-      let { element, children, ...otherProps } = this.props;
+      let { tagName, children, ...otherProps } = this.props;
 
       var newProps = clone(otherProps);
       if (!newProps.style){
@@ -53,7 +53,7 @@ export default class Animove extends React.Component {
       newProps.style.left = left;
 
       var animatedComponent = React.createElement(
-        element, newProps, children
+        tagName, newProps, children
       );
 
       React.render(animatedComponent, animatedNode);
@@ -65,4 +65,5 @@ export default class Animove extends React.Component {
   componentDidUpdate(){
     this.moveAnimatedComponent();
   }
+
 };
