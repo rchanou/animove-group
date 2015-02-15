@@ -38,7 +38,7 @@ class Demo extends React.Component {
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
     var listNodes = this.state.list.map(item => {
-      return <Movable style={style} key={item}>
+      return <Movable className='anim' key={item}>
         {item}
       </Movable>;
     });
