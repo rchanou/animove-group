@@ -29,8 +29,6 @@ class Demo extends React.Component {
   state = { shifted: false, destroyed: false, list: [1, 2, 3] };
 
   render(){
-    console.log('dest', this.state.destroyed);
-
     var calcStyle = clone(style);
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 

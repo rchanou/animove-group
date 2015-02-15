@@ -6,8 +6,6 @@ export default class Animove extends React.Component {
 
   static defaultProps = { tagName: 'div' };
 
-  state = { animating: false };
-
   render(){
     let { tagName, children, ...otherProps } = this.props;
 
