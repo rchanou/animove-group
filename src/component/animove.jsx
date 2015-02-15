@@ -74,9 +74,12 @@ export default class Animove extends React.Component {
         props.style = {};
       }
       
-      //props.style.position = 'absolute';
-      var buddy = this.refs[kid.key || kid].getDOMNode();
-      console.log(buddy);
+      var base = this.refs[kid.key || kid].getDOMNode();
+      var rect = base.getBoundingClientRect();
+      var parentRect = base.parentElement.parentElement.getBoundingClientRect();
+      props.style.position = 'absolute';
+      props.style.top = rect.top - parentRect.top;
+      props.style.left = rect.left - parentRect.left;
       
       movers.push( { type: kid.type || 'span', props } );
     }.bind(this));

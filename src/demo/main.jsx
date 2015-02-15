@@ -49,7 +49,7 @@ class Demo extends React.Component {
 
       {this.state.shifted && <div>buyakasha</div>}
 
-      <Animove element='ul'>
+      <Animove tagName='ul'>
         {listNodes}
         somethingelse
       </Animove>
