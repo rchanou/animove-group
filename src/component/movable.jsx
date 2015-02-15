@@ -21,19 +21,24 @@ export default class Movable extends React.Component {
 
   componentDidMount(){
     var node = this.refs.me.getDOMNode();
-    var parent = node.parentElement;
-    this.moverNode = document.createElement(this.props.element);
     node.setAttribute('id', 'a');
-    //var eventNode = node.parentElement.createElement(this.props.element);
+    var parent = node.parentElement;
+    console.log('parent', parent);
+    //this.moverNode = document.createElement(this.props.element);
+    var eventNode = document.createElement(this.props.element);
+    parent.appendChild(eventNode);
 
-    var moveMover = () => {
+    this.moveMover = () => {
+
       var rect = node.getBoundingClientRect();
       var parentRect = parent.getBoundingClientRect();
+      console.log('this is happening', rect.top, rect.left, parentRect.top, parentRect.left);
       var top = rect.top - parentRect.top;
       var left = rect.left - parentRect.left;
       //var top = rect.top + document.documentElement.scrollTop;
       //var left = rect.left + document.documentElement.scrollLeft;
 
+      /*
       this.moverNode.style.cssText = getComputedStyle(node, null).cssText;
       console.log('comp', getComputedStyle(node).cssText);
       this.moverNode.style.transition = this.props.transition;
@@ -43,32 +48,36 @@ export default class Movable extends React.Component {
       this.moverNode.style.position = 'absolute';
       this.moverNode.style.top = top + 'px';
       this.moverNode.style.left = left + 'px';
+      */
 
-      /*let { element, children, ...otherProps } = this.props;
+      let { element, transition, children, ...otherProps } = this.props;
       var eventComponentProps = objectAssign({}, otherProps);
+      eventComponentProps.style.transition = transition;
       eventComponentProps.style.position = 'absolute';
       eventComponentProps.style.top = top;
       eventComponentProps.style.left = left;
+      eventComponentProps.style.visibility = '';
+      console.log('event props', eventComponentProps);
 
       var eventComponent = React.createElement(
-
+        element,
         eventComponentProps,
-        this.props.children
+        children
       );
 
-      React.render(eventComponent, eventNode);      */
+      React.render(eventComponent, eventNode);
     };
-    moveMover();
+    this.moveMover();
 
-    parent.appendChild(this.moverNode);
+    //parent.appendChild(this.moverNode);
     //document.body.appendChild(this.moverNode);
-
+/*
     var changeObserver = new MutationObserver(e => {
       console.log('dom change', e);
 
-      moveMover();
+      this.moveMover();
 
-      /*
+
       let { element, children, ...otherProps } = this.props;
 
       var moverProps = objectAssign({}, otherProps);
@@ -86,13 +95,17 @@ export default class Movable extends React.Component {
       }
 
       React.render(mover, this.moverNode);
-      */
+
     }.bind(this));
 
     changeObserver.observe(node, {
       attributes: true,
       attributeOldValue: true,
       attributeFilter: ['style']
-    });
+    });*/
+  }
+
+  componentDidUpdate(){
+    this.moveMover();
   }
 };
