@@ -26,14 +26,17 @@ var style = {
 
 class Demo extends React.Component {
 
-  state = { shifted: false, destroyed: false, list: [1, 2, 3] };
+  state = { shifted: false, destroyed: false, list: [1, 2, 3, 4] };
 
   render(){
     var calcStyle = clone(style);
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
     var listNodes = this.state.list.map(item => {
-      return <li className='anim' key={item}>
+      return <li className='anim'
+        style={{ backgroundColor: this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)' }}
+        key={item}
+      >
         {item}
       </li>;
     });
@@ -47,11 +50,10 @@ class Demo extends React.Component {
         Mount/Unmount Test
       </button>
 
-      {this.state.shifted && <div>buyakasha</div>}
+      {this.state.shifted && false && <div>buyakasha</div>}
 
       <Animove tagName='ul'>
         {listNodes}
-        somethingelse
       </Animove>
     </div>;
   }

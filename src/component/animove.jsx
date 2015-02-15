@@ -14,7 +14,7 @@ export default class Animove extends React.Component {
     var kids = [];
     
     React.Children.forEach(this.props.children, kid => {
-      console.log(kid);
+      //console.log(kid);
       
       var newKid;
       if (kid.props){
@@ -95,74 +95,18 @@ export default class Animove extends React.Component {
     this.receivingProps = true;
   }
   
-  componentDidUpdate(){
+  componentDidUpdate(prevProps, prevState){
+    console.log('updating', prevState.movers, this.state.movers);
+  
     if (!this.receivingProps){
+      console.log('short foo');
       return;
     }
+    console.log('k then');
+    
     this.receivingProps = false;
       
     this.setMovers();
-    
-    /*
-    var newProps = clone(otherProps);
-    newProps.ref = 'me';
-
-    if (!newProps.style){
-      newProps.style = {};
-    }
-
-    newProps.style.visibility = 'hidden';
-    delete newProps.style.transition;
-    delete newProps.style.WebkitTransition;
-    delete newProps.style.transitionDuration;
-    delete newProps.style.WebkitTransitionDuration;
-    delete newProps.style.transitionDelay;
-    delete newProps.style.WebkitTransitionDelay;
-
-    return React.createElement(tagName, newProps, children);
-    */
   }
-  
-  /*
-  componentDidMount(){
-    var me = this.refs.me.getDOMNode();
-    var parent = me.parentElement;//.parentElement;
-
-    this.animatedNode = document.createElement(this.props.tagName);
-    parent.appendChild(this.animatedNode);
-
-    this.moveAnimatedComponent = () => {
-      var rect = me.getBoundingClientRect();
-      var parentRect = parent.parentElement.getBoundingClientRect();
-      var top = rect.top - parentRect.top;
-      var left = rect.left - parentRect.left;
-
-      let { tagName, children, ...otherProps } = this.props;
-
-      var newProps = clone(otherProps);
-      if (!newProps.style){
-        newProps.style = {};
-      }
-      newProps.style.position = 'absolute';
-      newProps.style.top = top;
-      newProps.style.left = left;
-
-      var animatedComponent = React.createElement(
-        tagName, newProps, children
-      );
-
-      React.render(animatedComponent, this.animatedNode);
-    };
-
-    this.moveAnimatedComponent();
-  }
-
-  componentDidUpdate(){
-    this.moveAnimatedComponent();
-  }
-
-  componentWillUnmount(){
-    React.unmountComponentAtNode(this.animatedNode);
-  }
-  */
+ 
 };
