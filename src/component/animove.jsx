@@ -32,7 +32,7 @@ export default class Animove extends React.Component {
       } else {
         newKid = React.createElement(
           'span',
-          { key: kid, style: { visibility: 'hidden' } },
+          { key: kid, ref: kid, style: { visibility: 'hidden' } },
           kid
         );
       }
@@ -41,7 +41,7 @@ export default class Animove extends React.Component {
     
     for (var mover of this.state.movers){
       let { children, ...props } = mover.props;
-      console.log('creating', mover.type, props, children);
+      //console.log('creating', mover.type, props, children);
       var newKid = React.createElement(
         mover.type,
         props,
@@ -51,7 +51,7 @@ export default class Animove extends React.Component {
       kids.push(newKid);
     }
     
-    console.log('kids', this.props.children);
+    //console.log('kids', this.props.children);
     
     return React.createElement(
       tagName, otherProps, kids
@@ -62,17 +62,25 @@ export default class Animove extends React.Component {
     var movers = [];
     
     React.Children.forEach(this.props.children, kid => {
+      var props;
       if (kid.props){
-        var props = clone(kid.props);
-        props.key = kid.key + 'mover';
-        //delete props.style.visibility;
-      
-        movers.push( { type: kid.type, props } );
+        props = clone(kid.props);        
       } else {
-        movers.push( { type: 'span', props: { key: kid + 'mover', children: kid } } );
+        props = { children: kid };
       }
-    });
-    console.log('will change state', this.state, movers);
+      props.key = (kid.key || kid) + 'mover';
+      
+      if (!props.style){
+        props.style = {};
+      }
+      
+      //props.style.position = 'absolute';
+      var buddy = this.refs[kid.key || kid].getDOMNode();
+      console.log(buddy);
+      
+      movers.push( { type: kid.type || 'span', props } );
+    }.bind(this));
+    //console.log('will change state', this.state, movers);
     this.setState({ movers });
   }
   
@@ -90,7 +98,7 @@ export default class Animove extends React.Component {
     }
     this.receivingProps = false;
       
-      
+    this.setMovers();
     
     /*
     var newProps = clone(otherProps);
