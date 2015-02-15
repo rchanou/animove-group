@@ -1,7 +1,7 @@
 import React from 'react/addons';
 import clone from 'clone';
 
-import Movable from '../component/movable.jsx';
+import Animove from '../component/animove.jsx';
 
 
 function shuffle(array) {
@@ -38,19 +38,19 @@ class Demo extends React.Component {
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
     var listNodes = this.state.list.map(item => {
-      return <Movable className='anim' key={item}>
+      return <Animove className='anim' key={item}>
         {item}
-      </Movable>;
+      </Animove>;
     });
 
     return <div onClick={this._onClick.bind(this)}>
       {this.state.shifted && <div>buyakasha</div>}
 
-      <Movable
+      <Animove
         style={calcStyle}
       >
         Sup
-      </Movable>
+      </Animove>
 
       {listNodes}
     </div>;

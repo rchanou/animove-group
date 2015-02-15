@@ -2,7 +2,7 @@ import React from 'react/addons';
 import clone from 'clone';
 
 
-export default class Movable extends React.Component {
+export default class Animove extends React.Component {
 
   static defaultProps = { element: 'div' };
 
