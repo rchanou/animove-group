@@ -26,9 +26,11 @@ var style = {
 
 class Demo extends React.Component {
 
-  state = { shifted: false, list: [1, 2, 3] };
+  state = { shifted: false, destroyed: false, list: [1, 2, 3] };
 
   render(){
+    console.log('dest', this.state.destroyed);
+
     var calcStyle = clone(style);
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
@@ -38,12 +40,20 @@ class Demo extends React.Component {
       </Animove>;
     });
 
-    return <div onClick={this._onClick.bind(this)}>
+    return <div>
+      <button onClick={this._onClick.bind(this)}>
+        Shift and Shuffle
+      </button>
+
+      <button onClick={this._onDestroyClick.bind(this)}>
+        Mount/Unmount Test
+      </button>
+
       {this.state.shifted && <div>buyakasha</div>}
 
-      <Animove style={calcStyle}>
+      {!this.state.destroyed && <Animove style={calcStyle}>
         Sup
-      </Animove>
+      </Animove>}
 
       <div>
         {listNodes}
@@ -58,10 +68,8 @@ class Demo extends React.Component {
     });
   }
 
-  componentDidMount(){
-    setTimeout(() => {
-      this.forceUpdate();
-    }.bind(this), 5000);
+  _onDestroyClick(){
+    this.setState({ destroyed: !this.state.destroyed });
   }
 
 }

@@ -33,8 +33,8 @@ export default class Animove extends React.Component {
     var me = this.refs.me.getDOMNode();
     var parent = me.parentElement.parentElement;
 
-    var animatedNode = document.createElement(this.props.tagName);
-    parent.appendChild(animatedNode);
+    this.animatedNode = document.createElement(this.props.tagName);
+    parent.appendChild(this.animatedNode);
 
     this.moveAnimatedComponent = () => {
       var rect = me.getBoundingClientRect();
@@ -56,7 +56,7 @@ export default class Animove extends React.Component {
         tagName, newProps, children
       );
 
-      React.render(animatedComponent, animatedNode);
+      React.render(animatedComponent, this.animatedNode);
     };
 
     this.moveAnimatedComponent();
@@ -64,6 +64,10 @@ export default class Animove extends React.Component {
 
   componentDidUpdate(){
     this.moveAnimatedComponent();
+  }
+
+  componentWillUnmount(){
+    React.unmountComponentAtNode(this.animatedNode);
   }
 
 };
