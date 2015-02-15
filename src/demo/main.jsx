@@ -6,8 +6,7 @@ import Movable from '../component/movable.jsx';
 
 var style = {
   WebkitTransition: 'all 3s ease-out',
-  transition: 'all ease-out 3s',
-  backgroundColor: 'hsl(180,50%,50%)'
+  transition: 'all ease-out 3s'
 };
 
 
@@ -19,11 +18,21 @@ class Demo extends React.Component {
     return <div onClick={this._onClick.bind(this)}>
       {this.state.shifted && <div>buyakasha</div>}
 
+
       <Movable
-        style={objectAssign({}, style, this.state.shifted? { backgroundColor: 'red' }: {})}
+        style={objectAssign({}, { backgroundColor: this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)' })}
       >
         Sup
       </Movable>
+      <div>
+        ttt
+        <div>
+          misc test stuff
+        </div>
+        <p>
+          homiez
+        </p>
+      </div>
     </div>;
   }
 
@@ -40,4 +49,4 @@ class Demo extends React.Component {
 }
 
 
-React.render(<Demo />, document.body);
+React.render(<Demo />, document.getElementById('main'));
