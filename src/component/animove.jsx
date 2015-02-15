@@ -6,8 +6,14 @@ export default class Animove extends React.Component {
 
   static defaultProps = { tagName: 'div' };
 
+
+
   render(){
     let { tagName, children, ...otherProps } = this.props;
+
+    React.Children.map(this.props.children, child => {
+      console.log(child);
+    });
 
     var newProps = clone(otherProps);
     newProps.ref = 'me';
@@ -29,14 +35,14 @@ export default class Animove extends React.Component {
 
   componentDidMount(){
     var me = this.refs.me.getDOMNode();
-    var parent = me.parentElement.parentElement;
+    var parent = me.parentElement;//.parentElement;
 
     this.animatedNode = document.createElement(this.props.tagName);
     parent.appendChild(this.animatedNode);
 
     this.moveAnimatedComponent = () => {
       var rect = me.getBoundingClientRect();
-      var parentRect = parent.getBoundingClientRect();
+      var parentRect = parent.parentElement.getBoundingClientRect();
       var top = rect.top - parentRect.top;
       var left = rect.left - parentRect.left;
 

@@ -33,9 +33,9 @@ class Demo extends React.Component {
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
     var listNodes = this.state.list.map(item => {
-      return <Animove className='anim' key={item}>
+      return <li className='anim' key={item}>
         {item}
-      </Animove>;
+      </li>;
     });
 
     return <div>
@@ -49,13 +49,12 @@ class Demo extends React.Component {
 
       {this.state.shifted && <div>buyakasha</div>}
 
-      {!this.state.destroyed && <Animove style={calcStyle}>
-        Sup
-      </Animove>}
-
-      <div>
+      <Animove element='ul'>
         {listNodes}
-      </div>
+        somethingelse
+      </Animove>
+
+      <ul><li>aa</li><li>bb</li></ul>
     </div>;
   }
 
