@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react": "^0.13.0-beta.1",
-    "clone": "^1.0.0"
+    "6to5": "^3.6.5",
+    "clone": "^1.0.0",
+    "react": "^0.13.0-beta.1"
   },
   "devDependencies": {
     "6to5-core": "^3.6.4",

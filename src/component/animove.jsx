@@ -19,8 +19,8 @@
  */
 
 import React from 'react/addons';
+import { chan, go, put, take } from 'js-csp';
 import clone from 'clone';
-
 
 export default class Animove extends React.Component {
 

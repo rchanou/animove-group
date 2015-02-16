@@ -1,3 +1,4 @@
+import '6to5/polyfill';
 import React from 'react';
 import clone from 'clone';
 
