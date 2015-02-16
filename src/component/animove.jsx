@@ -1,6 +1,3 @@
-import React from 'react/addons';
-import clone from 'clone';
-
 /*
   The Gist of How This Works (figure out the rest):
 
@@ -15,8 +12,14 @@ import clone from 'clone';
   change, the positions of the mover children are set to the calculated
   positions of the invisible children.
 
-  (insert KONY joke)
+  If the child elements have appropriate CSS transition properties set the usual
+  ways (inline, by class, whatever), the movements will be animated!
+
+  (insert KONY joke about invisible children)
  */
+
+import React from 'react/addons';
+import clone from 'clone';
 
 
 export default class Animove extends React.Component {
