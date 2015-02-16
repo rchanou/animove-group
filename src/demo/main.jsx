@@ -50,7 +50,7 @@ class Demo extends React.Component {
         Mount/Unmount Test
       </button>
 
-      {this.state.shifted && false && <div>buyakasha</div>}
+      {this.state.shifted && <div>buyakasha</div>}
 
       {!this.state.destroyed && <Animove tagName='ul'>
         {listNodes}
