@@ -58,10 +58,14 @@ class Demo extends React.Component {
     </div>;
   }
 
+  componentDidUpdate(){
+    console.log(this.state);
+  }
+
   _onClick(){
     this.setState({
       shifted: !this.state.shifted,
-      list: shuffle(this.state.list)
+      list: shuffle(this.state.list.concat([this.state.list.length + 1]))
     });
   }
 
