@@ -1,5 +1,6 @@
+import '6to5/polyfill';
 import React from 'react';
-import clone from 'clone';
+import _ from 'lodash';
 
 import Animove from '../component/animove.jsx';
 
@@ -29,7 +30,7 @@ class Demo extends React.Component {
   state = { shifted: false, destroyed: false, list: [1, 2, 3, 4] };
 
   render(){
-    var calcStyle = clone(style);
+    var calcStyle = _.cloneDeep(style);
     calcStyle.backgroundColor = this.state.shifted? 'rgb(0,0,255)': 'rgb(255,0,0)';
 
     var listNodes = this.state.list.map(item => {

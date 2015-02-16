@@ -6,6 +6,10 @@ var module = {
       test: /\.jsx?$/,
       exclude: /node_modules/,
       loader: '6to5-loader?experimental&playground'
+    },
+    {
+      test: /\js-csp(.*).js$/,
+      loader: '6to5-loader?experimental&playground'
     }
   ]
 };

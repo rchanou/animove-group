@@ -19,7 +19,10 @@
  */
 
 import React from 'react/addons';
-import clone from 'clone';
+import { chan, go, put, take, CLOSED } from 'js-csp';
+import _ from 'lodash';
+
+import Z from './lazy-tag.jsx';
 
 
 export default class Animove extends React.Component {
@@ -36,7 +39,7 @@ export default class Animove extends React.Component {
     React.Children.forEach(this.props.children, kid => {
       var baseProps;
       if (kid.props){
-        baseProps = clone(kid.props);
+        baseProps = _.cloneDeep(kid.props);
       } else {
         baseProps = { children: kid };
       }
@@ -64,6 +67,10 @@ export default class Animove extends React.Component {
         children
       );
 
+      moverKid = <Z t={mover.type} {...moverProps}>
+        {children}
+      </Z>;
+
       allKids.push(moverKid);
     }
 
@@ -72,17 +79,18 @@ export default class Animove extends React.Component {
     );
   }
 
-  setMovers(){
+  calcMovers(){
     var movers = [];
 
     React.Children.forEach(this.props.children, kid => {
       var props;
       if (kid.props){
-        props = clone(kid.props);
+        props = _.cloneDeep(kid.props);
       } else {
         props = { children: kid };
       }
       props.key = (kid.key || kid) + 'MOVER';
+      props.ref = props.key;
 
       if (!props.style){
         props.style = {};
@@ -101,36 +109,107 @@ export default class Animove extends React.Component {
 
     // always sort the mover elements by key so as not to confuse React
     // the absolute positioning is what makes them show in the correct order
-    movers.sort((a, b) => { // native JS's ugly mutative sort FTW
-      if (a.props.key < b.props.key){
-        return -1;
-      } else {
-        return 1;
-      }
-    });
+    return _.sortBy(movers, mover => mover.props.key);
+  }
 
-    this.setState({ movers });
+  setMovers(){
+    this.setState({ movers: this.calcMovers() });
   }
 
   componentDidMount(){
-    this.setMovers();
+
+
+    this.chanKeys = [
+      'receiveProps', 'killEnd', 'moveEnd', 'addEnd'
+    ];
+
+    for (var key of this.chanKeys){
+      this[key] = chan();
+    }
+
+    go(function* (){
+      var e, keys, prevKeys, movers, prevMovers;
+
+      while (e !== CLOSED){
+        e = yield this.receiveProps;
+        if (e === CLOSED) return;
+
+        var kidKeys = [];
+        React.Children.forEach(this.props.children, kid => {
+          kidKeys.push(kid.key || kid);
+        });
+
+        //var deadKeys = _.filter(prevKeys, key => !_.contains(kidKeys, key));
+        var deadMovers = _.filter(
+          this.state.movers,
+          mover => !_.contains(kidKeys, mover.props.key)
+        );
+        var killKidEnd = chan();
+        for (var mover of deadMovers){
+          this.refs[mover.props.ref].getDOMNode().addEventListener('transitionend', () => {
+            go(function* (){
+              yield put(killKidEnd);
+            });
+          });
+          mover.props.style.opacity = 0;
+        }
+        var deadKidCount = 0;
+        while (deadKidCount < deadMovers.length){
+          yield killKidEnd;
+          deadKidCount++;
+        }
+
+
+        e = yield this.killEnd;
+        if (e === CLOSED) return;
+
+
+        e = yield this.moveEnd;
+        if (e === CLOSED) return;
+
+
+
+        var newKeys = _.filter(kidKeys, key => !_.contains(prevKeys, key));
+
+
+
+        yield put(this.addStart, newKeys);
+        e = yield this.addEnd;
+        if (e === CLOSED) return;
+
+        prevKeys = kidKeys;
+        prevMovers = movers;
+      }
+    }.bind(this));
+
+    //this.setMovers();
   }
 
   // this.receivingProps flag short-circuits componentDidUpdate after movers are
   // updated, preventing circular setState -> componentDidUpdate -> setState...
 
-  componentWillReceiveProps(){
-    this.receivingProps = true;
+  componentWillReceiveProps(nextProps){
+    go(function* (){
+      yield put(this.receiveProps);
+    }.bind(this));
+
+    //this.receivingProps = true;
   }
 
   componentDidUpdate(prevProps, prevState){
-    if (!this.receivingProps){
+    /*if (!this.receivingProps){
       return;
     }
 
     this.receivingProps = false;
 
-    this.setMovers();
+    this.setMovers();*/
+  }
+
+  componentWillUnmount(){
+    for (var key of this.chanKeys){
+      this[key].close();
+    }
   }
 
 };
