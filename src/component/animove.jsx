@@ -1,6 +1,23 @@
 import React from 'react/addons';
 import clone from 'clone';
 
+/*
+  The Gist of How This Works (figure out the rest):
+
+  Children passed in are not directly rendered.
+
+  Rather, on mount, invisible base children are derived from the actual children.
+
+  Then, absolutely-positioned mover children are mounted and set to the
+  calculated positions of their respective invisible buddies.
+
+  Every time new props/children are passed in and the invisible children
+  change, the positions of the mover children are set to the calculated
+  positions of the invisible children.
+
+  (insert KONY joke)
+ */
+
 
 export default class Animove extends React.Component {
 
@@ -11,7 +28,7 @@ export default class Animove extends React.Component {
   render(){
     let { tagName, children, ...otherProps } = this.props;
 
-    var kids = [];
+    var allKids = [];
 
     React.Children.forEach(this.props.children, kid => {
       var baseProps;
@@ -28,27 +45,27 @@ export default class Animove extends React.Component {
       }
       baseProps.style.visibility = 'hidden';
 
-      var newKid = React.createElement(
+      var baseKid = React.createElement(
         kid.type || 'span', baseProps, kid.props.children
       );
 
-      kids.push(newKid);
+      allKids.push(baseKid);
     });
 
     for (var mover of this.state.movers){
       let { children, ...moverProps } = mover.props;
 
-      var newKid = React.createElement(
+      var moverKid = React.createElement(
         mover.type,
         moverProps,
         children
       );
 
-      kids.push(newKid);
+      allKids.push(moverKid);
     }
 
     return React.createElement(
-      tagName, otherProps, kids
+      tagName, otherProps, allKids
     );
   }
 
@@ -62,7 +79,7 @@ export default class Animove extends React.Component {
       } else {
         props = { children: kid };
       }
-      props.key = (kid.key || kid) + 'mover';
+      props.key = (kid.key || kid) + 'MOVER';
 
       if (!props.style){
         props.style = {};
@@ -71,6 +88,7 @@ export default class Animove extends React.Component {
       var base = this.refs[kid.key || kid].getDOMNode();
       var rect = base.getBoundingClientRect();
       var parentRect = base.parentElement.parentElement.getBoundingClientRect();
+
       props.style.position = 'absolute';
       props.style.top = rect.top - parentRect.top;
       props.style.left = rect.left - parentRect.left;
@@ -78,7 +96,9 @@ export default class Animove extends React.Component {
       movers.push( { type: kid.type || 'span', props } );
     }.bind(this));
 
-    movers.sort((a, b) => {
+    // always sort the mover elements by key so as not to confuse React
+    // the absolute positioning is what makes them show in the correct order
+    movers.sort((a, b) => { // native JS's ugly mutative sort FTW
       if (a.props.key < b.props.key){
         return -1;
       } else {
@@ -92,6 +112,9 @@ export default class Animove extends React.Component {
   componentDidMount(){
     this.setMovers();
   }
+
+  // this.receivingProps flag short-circuits componentDidUpdate after movers are
+  // updated, preventing circular setState -> componentDidUpdate -> setState...
 
   componentWillReceiveProps(){
     this.receivingProps = true;
