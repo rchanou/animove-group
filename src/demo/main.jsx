@@ -52,9 +52,9 @@ class Demo extends React.Component {
 
       {this.state.shifted && false && <div>buyakasha</div>}
 
-      <Animove tagName='ul'>
+      {!this.state.destroyed && <Animove tagName='ul'>
         {listNodes}
-      </Animove>
+      </Animove>}
     </div>;
   }
 

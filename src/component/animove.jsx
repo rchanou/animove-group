@@ -2,6 +2,30 @@ import React from 'react/addons';
 import clone from 'clone';
 
 
+class Watcher extends React.Component {
+
+  render(){
+    let { tagName, children, ...props } = this.props;
+    return React.createElement(
+      tagName, props, children
+    );
+  }
+
+  componentWillMount(){
+    console.log('mounting');
+  }
+
+  componentDidUpdate(){
+    console.log('updating');
+  }
+
+  componentWillUnmount(){
+    console.log('unmounting');
+  }
+
+}
+
+
 export default class Animove extends React.Component {
 
   static defaultProps = { tagName: 'div' };
@@ -14,35 +38,43 @@ export default class Animove extends React.Component {
     var kids = [];
 
     React.Children.forEach(this.props.children, kid => {
-      var props;
+      var baseProps;
       if (kid.props){
-        props = clone(kid.props);
+        baseProps = clone(kid.props);
       } else {
-        props = { children: kid };
+        baseProps = { children: kid };
       }
-      props.key = (kid.key || kid);
-      props.ref = props.key;
+      baseProps.key = (kid.key || kid);
+      baseProps.ref = (kid.key || kid);
 
-      if (!props.style){
-        props.style = {};
+      if (!baseProps.style){
+        baseProps.style = {};
       }
-      props.style.visibility = 'hidden';
+      baseProps.style.visibility = 'hidden';
 
       var newKid = React.createElement(
-        kid.type || 'span', props, kid.props.children
+        kid.type || 'span', baseProps, kid.props.children
       );
+
+      /*var newKid = <Watcher tagName={kid.type || 'span'} {...baseProps}>
+        {kid.props.children}
+      </Watcher>;*/
 
       kids.push(newKid);
     });
 
     for (var mover of this.state.movers){
-      let { children, ...props } = mover.props;
+      let { children, ...moverProps } = mover.props;
 
       var newKid = React.createElement(
         mover.type,
-        props,
+        moverProps,
         children
       );
+
+      /*var newKid = <Watcher tagName={mover.type} {...moverProps}>
+        {children}
+      </Watcher>;*/
 
       kids.push(newKid);
     }
@@ -69,6 +101,7 @@ export default class Animove extends React.Component {
       }
 
       var base = this.refs[kid.key || kid].getDOMNode();
+      //var base = React.findDOMNode(this.refs[kid.key || kid]);
       var rect = base.getBoundingClientRect();
       var parentRect = base.parentElement.parentElement.getBoundingClientRect();
       props.style.position = 'absolute';
@@ -78,6 +111,14 @@ export default class Animove extends React.Component {
       movers.push( { type: kid.type || 'span', props } );
     }.bind(this));
 
+    movers.sort((a, b) => {
+      if (a.props.key < b.props.key){
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    console.log('movers', movers);
     this.setState({ movers });
   }
 
