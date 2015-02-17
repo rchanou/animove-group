@@ -52,8 +52,12 @@ class Demo extends React.Component {
         Shift and Shuffle
       </button>
 
-      <button onClick={this._onDestroyClick.bind(this)}>
-        Mount/Unmount Test
+      <button onClick={this._onTestClick.bind(this)}>
+        Transition Event Test
+      </button>
+
+      <button onClick={this._onRemoveClick.bind(this)}>
+        Remove Test
       </button>
 
       {!this.state.destroyed && <Animove tagName='ul'>
@@ -85,10 +89,16 @@ class Demo extends React.Component {
     });
   }
 
-  _onDestroyClick(){
+  _onTestClick(){
     this.setState({
       destroyed: !this.state.destroyed,
       testColor: Math.random() < 0.5? 'orange': 'purple'
+    });
+  }
+
+  _onRemoveClick(){
+    this.setState({
+      list: _.sample(this.state.list, 4)
     });
   }
 

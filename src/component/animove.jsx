@@ -104,6 +104,7 @@ export default class Animove extends React.Component {
       }
 
       var base = this.refs[kid.key || kid].getDOMNode();
+      console.log(base.style);
       var rect = base.getBoundingClientRect();
       var parentRect = base.parentElement.parentElement.getBoundingClientRect();
 
@@ -165,7 +166,7 @@ export default class Animove extends React.Component {
 
         var killCount = 0;
         while (killCount < deadMoverCount){
-          console.log('b4 kill');
+          //console.log('b4 kill');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           killCount++;
@@ -185,7 +186,7 @@ export default class Animove extends React.Component {
           props.onTransitionEnd = () => {
             go(function* (){
               yield put(this.transitionEnd, props.key);
-              console.log('transition end', props.key);
+              //console.log('transition end', props.key);
             }.bind(this));
           };
 
@@ -202,15 +203,15 @@ export default class Animove extends React.Component {
           props.style.left = rect.left - parentRect.left;
           if (!_.contains(prevMoverKeys, props.key)){
             //console.log('opacity to 0');
-            console.log('new');
+            //console.log('new');
             props.style.opacity = 0;
           } else {
             var prev = _.find(prevMovers, mover => mover.props.key === props.key);
-            console.log(kid, prev);
+            //console.log(kid, prev);
             if (props.style.top !== prev.props.style.top || props.style.left !== prev.props.style.left){
               shownCount++;
             } else {
-              console.log('no change!');
+              //console.log('no change!');
             }
           }
 
@@ -237,7 +238,7 @@ export default class Animove extends React.Component {
 
         var newCount = 0;
         movers.forEach(mover => {
-          console.log('checking new', mover.props.key, prevMoverKeys);
+          //console.log('checking new', mover.props.key, prevMoverKeys);
           if (!_.contains(prevMoverKeys, mover.props.key)){
             newCount++;
             mover.props.style.opacity = 1;
@@ -253,9 +254,11 @@ export default class Animove extends React.Component {
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           bornCount++;
-          console.log('made it here', bornCount, newCount);
+          //console.log('made it here', bornCount, newCount);
         }
 
+        this.transitionEnd.close();
+        this.transitionEnd = chan();
         console.log('END OF CYCLE');
       }
     }.bind(this));
