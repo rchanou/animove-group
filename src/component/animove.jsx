@@ -19,7 +19,7 @@
  */
 
 import React from 'react/addons';
-import { chan, go, put, take, CLOSED } from 'js-csp';
+import { chan, go, put, take, buffers, CLOSED } from 'js-csp';
 import _ from 'lodash';
 
 import Z from './lazy-tag.jsx';
@@ -104,7 +104,7 @@ export default class Animove extends React.Component {
       }
 
       var base = this.refs[kid.key || kid].getDOMNode();
-      console.log(base.style);
+      //console.log(base.style);
       var rect = base.getBoundingClientRect();
       var parentRect = base.parentElement.parentElement.getBoundingClientRect();
 
@@ -125,9 +125,12 @@ export default class Animove extends React.Component {
       'receiveProps', 'transitionEnd'
     ];
 
-    for (var key of this.chanKeys){
+    this.transitionEnd = chan();
+    this.receiveProps = chan(); //chan(buffers.dropping(1));
+
+    /*for (var key of this.chanKeys){
       this[key] = chan();
-    }
+    }*/
 
     /*go(function* (){
       yield put(this.receiveProps);

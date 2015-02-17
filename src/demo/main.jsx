@@ -24,6 +24,7 @@ var style = {
   width: '100%'
 };
 
+var count = 5;
 
 class Demo extends React.Component {
 
@@ -79,13 +80,13 @@ class Demo extends React.Component {
   }
 
   componentDidUpdate(){
-    //console.log(this.state);
+    console.log(this.state.list);
   }
 
   _onClick(){
     this.setState({
       shifted: !this.state.shifted,
-      list: shuffle(this.state.list.concat([this.state.list.length + 1]))
+      list: this.state.list.concat([count++])
     });
   }
 
@@ -98,7 +99,8 @@ class Demo extends React.Component {
 
   _onRemoveClick(){
     this.setState({
-      list: _.sample(this.state.list, 4)
+      //list: _.sortBy(this.state.list, _.identity)
+      list: _(this.state.list).sample(this.state.list.length - 2).sortBy(_.identity).value()
     });
   }
 
