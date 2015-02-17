@@ -97,7 +97,7 @@ export default class Animove extends React.Component {
 
         var baseKeys = [];
         React.Children.forEach(this.props.children, kid => {
-          baseKeys.push(kid.key || kid);
+          baseKeys.push((kid.key || kid) + 'MOVER');
         });
         var movers = _.cloneDeep(this.state.movers);
 
@@ -107,14 +107,15 @@ export default class Animove extends React.Component {
         var deadMoverCount = 0;
         movers.forEach(mover => {
           prevMoverKeys.push(mover.props.key);
+          console.log('checking key', mover.props.key, baseKeys);
           if (!_.contains(baseKeys, mover.props.key)){
             deadMoverCount++;
             mover.props.style.opacity = 0;
           }
         });
-
+        //console.log(baseKeys, movers);
         this.setState({ movers });
-        
+
         var killCount = 0;
         while (killCount < deadMoverCount){
           console.log('b4 kill');
@@ -137,6 +138,7 @@ export default class Animove extends React.Component {
           props.onTransitionEnd = () => {
             go(function* (){
               yield put(this.transitionEnd, props.key);
+              console.log('transition end', props.key);
             }.bind(this));
           };
 
@@ -152,7 +154,7 @@ export default class Animove extends React.Component {
           props.style.top = rect.top - parentRect.top;
           props.style.left = rect.left - parentRect.left;
           if (!_.contains(prevMoverKeys, props.key)){
-            console.log('opacity to 0');
+            //console.log('opacity to 0');
             props.style.opacity = 0;
           } else {
             shownCount++;
@@ -165,13 +167,14 @@ export default class Animove extends React.Component {
         // the absolute positioning is what makes them show in the correct order
         movers = _.sortBy(movers, mover => mover.props.key);
 
-        console.log('will set state to', movers);
+        //console.log('will set state to', movers);
         this.setState({ movers });
+
         movers = _.cloneDeep(movers);
 
         var doneCount = 0;
         while (doneCount < shownCount){
-          console.log('b4 move');
+          //console.log('b4 move');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
         }
@@ -189,7 +192,7 @@ export default class Animove extends React.Component {
 
         var bornCount = 0;
         while (bornCount < newCount){
-          console.log('b4 add', bornCount, newCount);
+          //console.log('b4 add', bornCount, newCount);
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           bornCount++;
@@ -209,7 +212,7 @@ export default class Animove extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState){
-    console.log('updated', prevState.movers, this.state.movers);
+    //console.log('updated', prevState.movers, this.state.movers);
     //console.log('updated', this.state.movers, this.props.children);
   }
 

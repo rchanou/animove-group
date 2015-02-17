@@ -17,7 +17,6 @@ export default class Z extends React.Component {
     this.me = this.refs.me.getDOMNode();
 
     this.transitionEndListener = e => {
-      console.log('transition end', this.props);
       this.props.onTransitionEnd(e);
     }.bind(this);
 
