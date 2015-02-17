@@ -117,10 +117,11 @@ export default class Animove extends React.Component {
   }
 
   componentDidMount(){
-
+    //this.transitionEnd = chan();
 
     this.chanKeys = [
-      'receiveProps', 'killEnd', 'moveEnd', 'addEnd'
+      'receiveProps', 'transitionEnd'
+      //'receiveProps', 'killEnd', 'moveEnd', 'addEnd', 'transitionEnd'
     ];
 
     for (var key of this.chanKeys){
@@ -128,57 +129,117 @@ export default class Animove extends React.Component {
     }
 
     go(function* (){
-      var e, keys, prevKeys, movers, prevMovers;
+      var e;//, keys, prevKeys, movers, prevMovers;
 
       while (e !== CLOSED){
         e = yield this.receiveProps;
         if (e === CLOSED) return;
 
-        var kidKeys = [];
+        //var moverKeys = _.map(this.state.movers, mover => mover.props.key);
+        var baseKeys = [];
         React.Children.forEach(this.props.children, kid => {
-          kidKeys.push(kid.key || kid);
+          baseKeys.push(kid.key || kid);
+        });
+        var movers = _.cloneDeep(this.state.movers);
+
+        var prevMoverKeys = [];
+
+        // kill dead kids
+        var deadMoverCount = 0;
+        movers.forEach(mover => {
+          prevMoverKeys.push(mover.props.key);
+          if (!_.contains(baseKeys, mover.props.key)){
+            deadMoverCount++;
+            mover.props.style.opacity = 0;
+          }
         });
 
-        //var deadKeys = _.filter(prevKeys, key => !_.contains(kidKeys, key));
-        var deadMovers = _.filter(
-          this.state.movers,
-          mover => !_.contains(kidKeys, mover.props.key)
-        );
-        var killKidEnd = chan();
-        for (var mover of deadMovers){
-          this.refs[mover.props.ref].getDOMNode().addEventListener('transitionend', () => {
+        this.setState({ movers });
+
+        var killCount = 0;
+        while (killCount < deadMoverCount){
+          e = yield this.transitionEnd;
+          if (e === CLOSED) return;
+          killCount++;
+        }
+
+        //create/move living kids
+        var shownCount = 0;
+        React.Children.forEach(this.props.children, kid => {
+          var props;
+          if (kid.props){
+            props = _.cloneDeep(kid.props);
+          } else {
+            props = { children: kid };
+          }
+          props.key = (kid.key || kid) + 'MOVER';
+          props.onTransitionEnd = () => {
             go(function* (){
-              yield put(killKidEnd);
+              yield put(this.transitionEnd, props.key);
             });
-          });
-          mover.props.style.opacity = 0;
+          };
+
+          if (!props.style){
+            props.style = {};
+          }
+
+          var base = this.refs[kid.key || kid].getDOMNode();
+          var rect = base.getBoundingClientRect();
+          var parentRect = base.parentElement.parentElement.getBoundingClientRect();
+
+          props.style.position = 'absolute';
+          props.style.top = rect.top - parentRect.top;
+          props.style.left = rect.left - parentRect.left;
+          if (!_.contains(prevMoverKeys, props.key)){
+            props.style.opacity = 0;
+          } else {
+            shownCount++;
+          }
+
+          movers.push( { type: kid.type || 'span', props } );
+        }.bind(this));
+
+        // always sort the mover elements by key so as not to confuse React
+        // the absolute positioning is what makes them show in the correct order
+        movers = _.sortBy(movers, mover => mover.props.key);
+
+        /*movers.sort((a, b) => { // native JS's ugly mutative sort FTW
+          if (a.props.key < b.props.key){
+            return -1;
+          } else {
+            return 1;
+          }
+        });*/
+
+        this.setState({ movers });
+
+        var doneCount = 0;
+        while (doneCount < shownCount){
+          e = yield this.transitionEnd;
+          if (e === CLOSED) return;
         }
-        var deadKidCount = 0;
-        while (deadKidCount < deadMovers.length){
-          yield killKidEnd;
-          deadKidCount++;
+
+        //var newKeys = _.filter(kidKeys, key => !_.contains(prevKeys, key));
+
+        var newCount = 0;
+        movers.forEach(mover => {
+          if (!_.contains(prevMoverKeys, mover.props.key)){
+            newCount++;
+            delete mover.props.style.opacity;
+          }
+        });
+
+        this.setState({ movers });
+
+        var bornCount = 0;
+        while (bornCount < newCount){
+          e = yield this.transitionEnd;
+          if (e === CLOSED) return;
+          bornCount++;
         }
 
-
-        e = yield this.killEnd;
-        if (e === CLOSED) return;
-
-
-        e = yield this.moveEnd;
-        if (e === CLOSED) return;
-
-
-
-        var newKeys = _.filter(kidKeys, key => !_.contains(prevKeys, key));
-
-
-
-        yield put(this.addStart, newKeys);
-        e = yield this.addEnd;
-        if (e === CLOSED) return;
-
-        prevKeys = kidKeys;
-        prevMovers = movers;
+        //prevKeys = kidKeys;
+        //prevMovers = movers;
       }
     }.bind(this));
 
@@ -207,6 +268,8 @@ export default class Animove extends React.Component {
   }
 
   componentWillUnmount(){
+    //this.transitionEnd.close();
+
     for (var key of this.chanKeys){
       this[key].close();
     }
