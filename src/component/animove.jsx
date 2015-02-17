@@ -231,6 +231,8 @@ export default class Animove extends React.Component {
           //console.log('b4 move');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
+          doneCount++;
+          console.log(doneCount, shownCount);
         }
 
         var newCount = 0;
