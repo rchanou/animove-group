@@ -117,11 +117,8 @@ export default class Animove extends React.Component {
   }
 
   componentDidMount(){
-    //this.transitionEnd = chan();
-
     this.chanKeys = [
       'receiveProps', 'transitionEnd'
-      //'receiveProps', 'killEnd', 'moveEnd', 'addEnd', 'transitionEnd'
     ];
 
     for (var key of this.chanKeys){
@@ -129,13 +126,12 @@ export default class Animove extends React.Component {
     }
 
     go(function* (){
-      var e;//, keys, prevKeys, movers, prevMovers;
+      var e;
 
       while (e !== CLOSED){
         e = yield this.receiveProps;
         if (e === CLOSED) return;
 
-        //var moverKeys = _.map(this.state.movers, mover => mover.props.key);
         var baseKeys = [];
         React.Children.forEach(this.props.children, kid => {
           baseKeys.push(kid.key || kid);
@@ -203,23 +199,14 @@ export default class Animove extends React.Component {
         // the absolute positioning is what makes them show in the correct order
         movers = _.sortBy(movers, mover => mover.props.key);
 
-        /*movers.sort((a, b) => { // native JS's ugly mutative sort FTW
-          if (a.props.key < b.props.key){
-            return -1;
-          } else {
-            return 1;
-          }
-        });*/
-
         this.setState({ movers });
 
         var doneCount = 0;
         while (doneCount < shownCount){
+          console.log('b4 trans');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
         }
-
-        //var newKeys = _.filter(kidKeys, key => !_.contains(prevKeys, key));
 
         var newCount = 0;
         movers.forEach(mover => {
@@ -237,39 +224,21 @@ export default class Animove extends React.Component {
           if (e === CLOSED) return;
           bornCount++;
         }
-
-        //prevKeys = kidKeys;
-        //prevMovers = movers;
       }
     }.bind(this));
 
-    //this.setMovers();
+    go(function* (){
+      yield put(this.receiveProps);
+    }.bind(this));
   }
-
-  // this.receivingProps flag short-circuits componentDidUpdate after movers are
-  // updated, preventing circular setState -> componentDidUpdate -> setState...
 
   componentWillReceiveProps(nextProps){
     go(function* (){
       yield put(this.receiveProps);
     }.bind(this));
-
-    //this.receivingProps = true;
-  }
-
-  componentDidUpdate(prevProps, prevState){
-    /*if (!this.receivingProps){
-      return;
-    }
-
-    this.receivingProps = false;
-
-    this.setMovers();*/
   }
 
   componentWillUnmount(){
-    //this.transitionEnd.close();
-
     for (var key of this.chanKeys){
       this[key].close();
     }
