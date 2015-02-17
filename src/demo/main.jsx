@@ -86,7 +86,7 @@ class Demo extends React.Component {
   _onClick(){
     this.setState({
       shifted: !this.state.shifted,
-      list: this.state.list.concat([count++])
+      list: shuffle(this.state.list.concat([count++]))
     });
   }
 

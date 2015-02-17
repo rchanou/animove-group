@@ -171,9 +171,11 @@ export default class Animove extends React.Component {
         while (killCount < deadMoverCount){
           //console.log('b4 kill');
           e = yield this.transitionEnd;
-          if (e === CLOSED) return;
+          //if (e === CLOSED) return;
           killCount++;
         }
+        this.transitionEnd.close();
+        this.transitionEnd = chan();
 
         //create/move living kids
         var shownCount = 0;
@@ -234,10 +236,12 @@ export default class Animove extends React.Component {
         while (doneCount < shownCount){
           //console.log('b4 move');
           e = yield this.transitionEnd;
-          if (e === CLOSED) return;
+          //if (e === CLOSED) return;
           doneCount++;
           console.log(doneCount, shownCount);
         }
+        this.transitionEnd.close();
+        this.transitionEnd = chan();
 
         var newCount = 0;
         movers.forEach(mover => {
@@ -255,11 +259,10 @@ export default class Animove extends React.Component {
         while (bornCount < newCount){
           //console.log('b4 add', bornCount, newCount);
           e = yield this.transitionEnd;
-          if (e === CLOSED) return;
+          //if (e === CLOSED) return;
           bornCount++;
           //console.log('made it here', bornCount, newCount);
         }
-
         this.transitionEnd.close();
         this.transitionEnd = chan();
         console.log('END OF CYCLE');
