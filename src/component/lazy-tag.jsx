@@ -22,7 +22,16 @@ export default class Z extends React.Component {
 
     this.me.addEventListener('transitionend', this.transitionEndListener);
 
-    this.props.onTransitionEnd();
+    //this.props.onTransitionEnd();
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    /*if(prevProps.style.top === this.props.style.top
+      && prevProps.style.left === this.props.style.left
+      && prevProps.style.opacity === this.props.style.opacity){
+      console.log('nuttin changed');
+      this.props.onTransitionEnd();
+    }*/
   }
 
   componentWillUnmount(){

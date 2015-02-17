@@ -29,7 +29,14 @@ export default class Animove extends React.Component {
 
   static defaultProps = { tagName: 'div' };
 
-  state = { movers: [] };
+  state = {
+    movers: [
+      /*{ type: 'li', props: { key: '1MOVER' } },
+      { type: 'li', props: { key: '2MOVER' } },
+      { type: 'li', props: { key: '3MOVER' } },
+      { type: 'li', props: { key: '4MOVER' } }*/
+    ]
+  };
 
   render(){
     let { tagName, children, ...otherProps } = this.props;
@@ -79,6 +86,39 @@ export default class Animove extends React.Component {
     );
   }
 
+  calcMovers(){
+    var movers = [];
+
+    React.Children.forEach(this.props.children, kid => {
+      var props;
+      if (kid.props){
+        props = _.cloneDeep(kid.props);
+      } else {
+        props = { children: kid };
+      }
+      props.key = (kid.key || kid) + 'MOVER';
+      props.ref = props.key;
+
+      if (!props.style){
+        props.style = {};
+      }
+
+      var base = this.refs[kid.key || kid].getDOMNode();
+      var rect = base.getBoundingClientRect();
+      var parentRect = base.parentElement.parentElement.getBoundingClientRect();
+
+      props.style.position = 'absolute';
+      props.style.top = rect.top - parentRect.top;
+      props.style.left = rect.left - parentRect.left;
+
+      movers.push( { type: kid.type || 'span', props } );
+    }.bind(this));
+
+    // always sort the mover elements by key so as not to confuse React
+    // the absolute positioning is what makes them show in the correct order
+    return _.sortBy(movers, mover => mover.props.key);
+  }
+
   componentDidMount(){
     this.chanKeys = [
       'receiveProps', 'transitionEnd'
@@ -88,12 +128,20 @@ export default class Animove extends React.Component {
       this[key] = chan();
     }
 
+    /*go(function* (){
+      yield put(this.receiveProps);
+    }.bind(this));*/
+
+    this.setState({ movers: this.calcMovers() });
+
     go(function* (){
       var e;
 
       while (e !== CLOSED){
         e = yield this.receiveProps;
         if (e === CLOSED) return;
+
+        var prevMovers = _.cloneDeep(this.state.movers);
 
         var baseKeys = [];
         React.Children.forEach(this.props.children, kid => {
@@ -107,7 +155,6 @@ export default class Animove extends React.Component {
         var deadMoverCount = 0;
         movers.forEach(mover => {
           prevMoverKeys.push(mover.props.key);
-          console.log('checking key', mover.props.key, baseKeys);
           if (!_.contains(baseKeys, mover.props.key)){
             deadMoverCount++;
             mover.props.style.opacity = 0;
@@ -127,7 +174,7 @@ export default class Animove extends React.Component {
         //create/move living kids
         var shownCount = 0;
         var movers = [];
-        React.Children.forEach(this.props.children, kid => {
+        React.Children.forEach(this.props.children, (kid, i) => {
           var props;
           if (kid.props){
             props = _.cloneDeep(kid.props);
@@ -155,9 +202,16 @@ export default class Animove extends React.Component {
           props.style.left = rect.left - parentRect.left;
           if (!_.contains(prevMoverKeys, props.key)){
             //console.log('opacity to 0');
+            console.log('new');
             props.style.opacity = 0;
           } else {
-            shownCount++;
+            var prev = _.find(prevMovers, mover => mover.props.key === props.key);
+            console.log(kid, prev);
+            if (props.style.top !== prev.props.style.top || props.style.left !== prev.props.style.left){
+              shownCount++;
+            } else {
+              console.log('no change!');
+            }
           }
 
           movers.push( { type: kid.type || 'span', props } );
@@ -181,6 +235,7 @@ export default class Animove extends React.Component {
 
         var newCount = 0;
         movers.forEach(mover => {
+          console.log('checking new', mover.props.key, prevMoverKeys);
           if (!_.contains(prevMoverKeys, mover.props.key)){
             newCount++;
             mover.props.style.opacity = 1;
@@ -196,12 +251,11 @@ export default class Animove extends React.Component {
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           bornCount++;
+          console.log('made it here', bornCount, newCount);
         }
-      }
-    }.bind(this));
 
-    go(function* (){
-      yield put(this.receiveProps);
+        console.log('END OF CYCLE');
+      }
     }.bind(this));
   }
 

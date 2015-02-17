@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 
 import Animove from '../component/animove.jsx';
-
+import Z from '../component/lazy-tag.jsx';
 
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex ;
@@ -27,7 +27,12 @@ var style = {
 
 class Demo extends React.Component {
 
-  state = { shifted: false, destroyed: false, list: [1, 2, 3, 4] };
+  state = {
+    shifted: false,
+    destroyed: false,
+    list: [1, 2, 3, 4],
+    testColor: 'orange'
+  };
 
   render(){
     var calcStyle = _.cloneDeep(style);
@@ -51,12 +56,22 @@ class Demo extends React.Component {
         Mount/Unmount Test
       </button>
 
-      {this.state.shifted && <div>buyakasha</div>}
-
       {!this.state.destroyed && <Animove tagName='ul'>
         {listNodes}
       </Animove>}
+
+      <Z t='div' className='anim' style={{ backgroundColor: this.state.testColor }} onTransitionEnd={this._onTrans.bind(this)}>
+        transition test
+      </Z>
     </div>;
+  }
+
+  _onTrans(){
+    console.log('transitioned');
+  }
+
+  componentDidMount(){
+
   }
 
   componentDidUpdate(){
@@ -71,7 +86,10 @@ class Demo extends React.Component {
   }
 
   _onDestroyClick(){
-    this.setState({ destroyed: !this.state.destroyed });
+    this.setState({
+      destroyed: !this.state.destroyed,
+      testColor: Math.random() < 0.5? 'orange': 'purple'
+    });
   }
 
 }
