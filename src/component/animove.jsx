@@ -79,43 +79,6 @@ export default class Animove extends React.Component {
     );
   }
 
-  calcMovers(){
-    var movers = [];
-
-    React.Children.forEach(this.props.children, kid => {
-      var props;
-      if (kid.props){
-        props = _.cloneDeep(kid.props);
-      } else {
-        props = { children: kid };
-      }
-      props.key = (kid.key || kid) + 'MOVER';
-      props.ref = props.key;
-
-      if (!props.style){
-        props.style = {};
-      }
-
-      var base = this.refs[kid.key || kid].getDOMNode();
-      var rect = base.getBoundingClientRect();
-      var parentRect = base.parentElement.parentElement.getBoundingClientRect();
-
-      props.style.position = 'absolute';
-      props.style.top = rect.top - parentRect.top;
-      props.style.left = rect.left - parentRect.left;
-
-      movers.push( { type: kid.type || 'span', props } );
-    }.bind(this));
-
-    // always sort the mover elements by key so as not to confuse React
-    // the absolute positioning is what makes them show in the correct order
-    return _.sortBy(movers, mover => mover.props.key);
-  }
-
-  setMovers(){
-    this.setState({ movers: this.calcMovers() });
-  }
-
   componentDidMount(){
     this.chanKeys = [
       'receiveProps', 'transitionEnd'
@@ -151,9 +114,10 @@ export default class Animove extends React.Component {
         });
 
         this.setState({ movers });
-
+        
         var killCount = 0;
         while (killCount < deadMoverCount){
+          console.log('b4 kill');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           killCount++;
@@ -161,6 +125,7 @@ export default class Animove extends React.Component {
 
         //create/move living kids
         var shownCount = 0;
+        var movers = [];
         React.Children.forEach(this.props.children, kid => {
           var props;
           if (kid.props){
@@ -172,7 +137,7 @@ export default class Animove extends React.Component {
           props.onTransitionEnd = () => {
             go(function* (){
               yield put(this.transitionEnd, props.key);
-            });
+            }.bind(this));
           };
 
           if (!props.style){
@@ -187,6 +152,7 @@ export default class Animove extends React.Component {
           props.style.top = rect.top - parentRect.top;
           props.style.left = rect.left - parentRect.left;
           if (!_.contains(prevMoverKeys, props.key)){
+            console.log('opacity to 0');
             props.style.opacity = 0;
           } else {
             shownCount++;
@@ -194,16 +160,18 @@ export default class Animove extends React.Component {
 
           movers.push( { type: kid.type || 'span', props } );
         }.bind(this));
-
+        //console.log(newMovers);
         // always sort the mover elements by key so as not to confuse React
         // the absolute positioning is what makes them show in the correct order
         movers = _.sortBy(movers, mover => mover.props.key);
 
+        console.log('will set state to', movers);
         this.setState({ movers });
+        movers = _.cloneDeep(movers);
 
         var doneCount = 0;
         while (doneCount < shownCount){
-          console.log('b4 trans');
+          console.log('b4 move');
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
         }
@@ -212,7 +180,8 @@ export default class Animove extends React.Component {
         movers.forEach(mover => {
           if (!_.contains(prevMoverKeys, mover.props.key)){
             newCount++;
-            delete mover.props.style.opacity;
+            mover.props.style.opacity = 1;
+            //delete mover.props.style.opacity;
           }
         });
 
@@ -220,6 +189,7 @@ export default class Animove extends React.Component {
 
         var bornCount = 0;
         while (bornCount < newCount){
+          console.log('b4 add', bornCount, newCount);
           e = yield this.transitionEnd;
           if (e === CLOSED) return;
           bornCount++;
@@ -236,6 +206,11 @@ export default class Animove extends React.Component {
     go(function* (){
       yield put(this.receiveProps);
     }.bind(this));
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    console.log('updated', prevState.movers, this.state.movers);
+    //console.log('updated', this.state.movers, this.props.children);
   }
 
   componentWillUnmount(){
